@@ -1,0 +1,10 @@
+.atl/
+odd/
+.pi/
+.tmp/
+emotes/_test/
+node_modules/
+*.tgz
+*.log
+__pycache__/
+*.py[cod]
