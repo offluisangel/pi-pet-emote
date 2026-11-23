@@ -1,6 +1,6 @@
 {
   "name": "pi-pet-emote",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A single reactive pixel-art pet for Pi, driven by local session events with no model calls.",
   "license": "MIT",
   "repository": {
