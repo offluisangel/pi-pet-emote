@@ -104,7 +104,7 @@ test("public /emote previews retain their duration and use the pet widget identi
   await withSession(t, async ({ commands, ctx, shown, keys }) => {
     assert.deepEqual(keys, ["pi-pet-emote"]);
     const command = commands.get("emote");
-    assert.equal(command.description, "Preview a pi-pet-emote state: /emote <state> | demo");
+    assert.equal(command.description, "Preview or choose a pi-pet-emote pet: /emote <state> | demo | pet");
     await command.handler("think", ctx);
     assert.equal(shown.at(-1), "think#0");
     mock.timers.tick(5999);

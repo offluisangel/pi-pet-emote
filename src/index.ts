@@ -8,6 +8,7 @@ import type { Config, EmoteState, ResolvedRenderer } from "./types.ts";
 import type { Renderer } from "./renderer.ts";
 import { log, setDebug } from "./log.ts";
 import { loadLayeredConfig } from "./config.ts";
+import { PETS, loadPetSelection, savePetSelection } from "./pet-selection.ts";
 import { resolveEmoteSet, findEmoteSetDir, findYoloSetDir, loadEmotesConfig, EXTENSION_NAME } from "./emotes.ts";
 import { bannerConfigCandidates, createAccentTransform, resolveAccent } from "./accent.ts";
 import type { Rgb } from "./accent.ts";
@@ -78,6 +79,7 @@ const EMOTE_DESCRIPTIONS: Record<string, string> = {
   review: "marks a page in pink (review-* subagents)",
   jira: "moves between task cards (jira subagents)",
   demo: "plays every state in a row",
+  pet: "choose Mafe or Leo (saved for future sessions)",
 };
 
 /** Check if a set directory contains any image frames (PNG files in state subdirs). */
@@ -152,7 +154,8 @@ export default function (pi: ExtensionAPI) {
 
   if (!config.enabled) return;
 
-  let currentEmoteSet = "pet";
+  let selectedPet = loadPetSelection();
+  let currentEmoteSet: string = selectedPet ?? "pet";
   let widgetActive = false;
   let lastResolved = resolveRenderer(config.terminals, userConfiguredTerminals);
   let renderer = createRendererFromResolved(lastResolved, config);
@@ -203,7 +206,7 @@ export default function (pi: ExtensionAPI) {
   }
 
   function switchEmoteSet(modelId: string, thinkingLevel: string) {
-    const setName = resolveEmoteSet(modelId, thinkingLevel, config.emotes);
+    const setName = selectedPet ?? resolveEmoteSet(modelId, thinkingLevel, config.emotes);
     if (setName === currentEmoteSet) return;
     loadEmoteSet(setName);
     log(`switchEmoteSet: loaded "${setName}", state="${animator.currentState}"`);
@@ -352,15 +355,38 @@ export default function (pi: ExtensionAPI) {
   }
 
   pi.registerCommand?.("emote", {
-    description: "Preview a pi-pet-emote state: /emote <state> | demo",
+    description: "Preview or choose a pi-pet-emote pet: /emote <state> | demo | pet",
     getArgumentCompletions: (prefix: string) =>
-      [...EMOTE_STATES, "demo"]
+      [...EMOTE_STATES, "demo", "pet"]
         .filter((name) => name.startsWith(prefix.trim()))
         .map((name) => ({ value: name, label: name, description: EMOTE_DESCRIPTIONS[name] })),
     handler: async (args: string, ctx: any) => {
       const name = args.trim();
       if (!widgetActive) {
         ctx.ui?.notify?.(`[${EXTENSION_NAME}] avatar inactive (no UI or disabled)`, "warning");
+        return;
+      }
+      if (name === "pet") {
+        if (!ctx.hasUI) return;
+        const options = PETS.map((pet) => `${pet.name}${pet.id === currentEmoteSet ? " (active)" : ""}`);
+        const choice = await ctx.ui.select("Choose pet", options);
+        const pet = PETS.find((_pet, index) => options[index] === choice);
+        if (!pet || pet.id === currentEmoteSet) return;
+        try {
+          savePetSelection(pet.id);
+        } catch (error) {
+          ctx.ui.notify(`[${EXTENSION_NAME}] Could not save pet selection: ${error instanceof Error ? error.message : String(error)}`, "error");
+          return;
+        }
+        selectedPet = pet.id;
+        clearPreview();
+        if (greetTimer) { clearTimeout(greetTimer); greetTimer = null; }
+        if (farewellTimer) { clearTimeout(farewellTimer); farewellTimer = null; }
+        farewell = false;
+        animator.clearAllTimers();
+        loadEmoteSet(pet.id);
+        animator.resetRenderCache();
+        animator.transitionTo("idle");
         return;
       }
       if (name === "demo") {
@@ -371,7 +397,7 @@ export default function (pi: ExtensionAPI) {
         previewState(name as EmoteState);
         return;
       }
-      ctx.ui?.notify?.(`[${EXTENSION_NAME}] /emote <state>: ${[...EMOTE_STATES, "demo"].join(", ")}`, "info");
+      ctx.ui?.notify?.(`[${EXTENSION_NAME}] /emote <state>: ${[...EMOTE_STATES, "demo", "pet"].join(", ")}`, "info");
     },
   });
 
@@ -401,7 +427,8 @@ export default function (pi: ExtensionAPI) {
       ctx.ui.notify(`[${EXTENSION_NAME}] No image protocol detected \u2014 using ASCII emotes.`, "warning");
     }
 
-    const setName = resolveEmoteSet(ctx.model?.id ?? "", pi.getThinkingLevel(), config.emotes);
+    selectedPet = loadPetSelection();
+    const setName = selectedPet ?? resolveEmoteSet(ctx.model?.id ?? "", pi.getThinkingLevel(), config.emotes);
     log(`session_start: set="${setName}" dir="${findEmoteSetDir(setName, extDir, cwd)}"`);
     unwatchYolo();
     loadEmoteSet(setName);
