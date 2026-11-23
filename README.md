@@ -1,8 +1,8 @@
 # pi-pet-emote
 
-A reactive pixel-art pet beside your [Pi](https://pi.dev) prompt. 24 reactions follow local session events—thinking, tools, questions, and results—with no model calls.
+Meet **Mafe the dog** and **Leo the cat**, reactive pixel-art companions beside your [Pi](https://pi.dev) prompt. Choose either pet: 24 reactions follow local session events—thinking, tools, questions, and results—with no model calls.
 
-![Pixel-art pet with pink bows and a navy bandana](docs/avatar.png)
+![Mafe the dog and Leo the cat in pixel art](docs/package-cover.png)
 
 Requires Node.js **22.19+** and an interactive Pi session. Image support depends on your terminal; ASCII is the fallback.
 

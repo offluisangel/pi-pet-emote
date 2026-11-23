@@ -1,7 +1,7 @@
 {
   "name": "pi-pet-emote",
   "version": "0.2.0",
-  "description": "A single reactive pixel-art pet for Pi, driven by local session events with no model calls.",
+  "description": "Mafe the dog and Leo the cat: reactive pixel-art pets for Pi, driven by local session events with no model calls.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -38,12 +38,13 @@
     "src",
     "emotes",
     "docs/avatar.png",
+    "docs/package-cover.png",
     "config.json",
     "README.md",
     "LICENSE"
   ],
   "pi": {
-    "image": "./docs/avatar.png",
+    "image": "https://cdn.jsdelivr.net/npm/pi-pet-emote@0.2.0/docs/package-cover.png",
     "extensions": ["./src/index.ts"]
   },
   "devDependencies": {

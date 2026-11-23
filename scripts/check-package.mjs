@@ -20,15 +20,17 @@ try {
   const contents = (path) => tar("-xOzf", archive, `package/${path}`);
   const requireFile = (path) => assert.ok(files.includes(`package/${path}`), `missing ${path}`);
   for (const file of files) {
-    assert.match(file, /^package\/(?:package\.json|README\.md|LICENSE|config\.json|docs\/avatar\.png|src\/[^/]+\.ts|emotes\/(?:(?:pet|leo)\/(?:emotes\.json|[^/]+\/[^/]+\.png)|ascii[^/]*\/ascii\.yaml))$/, `unexpected package file: ${file}`);
+    assert.match(file, /^package\/(?:package\.json|README\.md|LICENSE|config\.json|docs\/(?:avatar|package-cover)\.png|src\/[^/]+\.ts|emotes\/(?:(?:pet|leo)\/(?:emotes\.json|[^/]+\/[^/]+\.png)|ascii[^/]*\/ascii\.yaml))$/, `unexpected package file: ${file}`);
   }
   for (const path of ["package.json", "LICENSE", "README.md", "config.json", "emotes/pet/emotes.json", "emotes/ascii-bot/ascii.yaml"]) requireFile(path);
   const manifest = JSON.parse(contents("package.json"));
   assert.equal(manifest.name, "pi-pet-emote");
   const sourceManifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
   assert.equal(manifest.version, sourceManifest.version);
-  assert.deepEqual(manifest.pi, { image: "./docs/avatar.png", extensions: ["./src/index.ts"] });
-  for (const path of [manifest.pi.image, ...manifest.pi.extensions]) requireFile(path.replace(/^\.\//, ""));
+  const coverUrl = `https://cdn.jsdelivr.net/npm/pi-pet-emote@${sourceManifest.version}/docs/package-cover.png`;
+  assert.equal(manifest.pi.image, coverUrl, "public cover URL must match the source package version");
+  assert.deepEqual(manifest.pi, { image: coverUrl, extensions: ["./src/index.ts"] });
+  for (const path of ["docs/avatar.png", "docs/package-cover.png", ...manifest.pi.extensions]) requireFile(path.replace(/^\.\//, ""));
   // Compare against actual runtime files, never an authoring fixture excluded from npm.
   for (const path of walk(join(root, "src"))) requireFile(path);
   const frames = walk(join(root, "emotes/pet")).filter((path) => path.endsWith(".png"));

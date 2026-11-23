@@ -36,8 +36,8 @@ test("MIT license retains both original notices and adds the current author", ()
   assert.ok(license.endsWith("SOFTWARE.\n"));
 });
 test("existing Pi declarations, runtime allowlist and legacy set resolution remain intact", () => {
-  assert.deepEqual(pkg.pi, { image: "./docs/avatar.png", extensions: ["./src/index.ts"] });
-  assert.deepEqual(pkg.files, ["src", "emotes", "docs/avatar.png", "config.json", "README.md", "LICENSE"]);
+  assert.deepEqual(pkg.pi, { image: `https://cdn.jsdelivr.net/npm/pi-pet-emote@${pkg.version}/docs/package-cover.png`, extensions: ["./src/index.ts"] });
+  assert.deepEqual(pkg.files, ["src", "emotes", "docs/avatar.png", "docs/package-cover.png", "config.json", "README.md", "LICENSE"]);
   assert.ok(pkg.keywords.includes("pi-package"));
   assert.equal(pkg.engines.node, ">=22.19.0");
   assert.equal(resolveEmoteSet("any", "off", []), "pet");
@@ -52,10 +52,10 @@ test("pack:check validates a real tarball without leaving public artifacts", () 
 test("pack:check accepts the source manifest version without changing input or leaving artifacts", () => {
   const scratch = mkdtempSync(join(tmpdir(), "pet-package-version-test-"));
   try {
-    for (const path of ["package.json", "README.md", "LICENSE", "src", "docs/avatar.png", "config.json", "emotes", "scripts/check-package.mjs"]) {
+    for (const path of ["package.json", "README.md", "LICENSE", "src", "docs/avatar.png", "docs/package-cover.png", "config.json", "emotes", "scripts/check-package.mjs"]) {
       cpSync(join(root, path), join(scratch, path), { recursive: true });
     }
-    writeFileSync(join(scratch, "package.json"), JSON.stringify({ ...pkg, version: "9.8.7" }, null, 2) + "\n");
+    writeFileSync(join(scratch, "package.json"), JSON.stringify({ ...pkg, version: "9.8.7", pi: { ...pkg.pi, image: "https://cdn.jsdelivr.net/npm/pi-pet-emote@9.8.7/docs/package-cover.png" } }, null, 2) + "\n");
     const before = readFileSync(join(scratch, "package.json"));
     const entries = readdirSync(scratch).sort();
     const result = spawnSync("npm", ["run", "pack:check"], { cwd: scratch, encoding: "utf8" });
@@ -73,7 +73,7 @@ for (const scenario of ["missing Leo metadata", "missing Leo frame", "unapproved
   test(`pack:check rejects ${scenario} without repairing package input`, () => {
     const scratch = mkdtempSync(join(tmpdir(), "leo-package-test-"));
     try {
-      for (const path of ["package.json", "README.md", "LICENSE", "src", "docs/avatar.png", "config.json", "emotes", "scripts/check-package.mjs"]) {
+      for (const path of ["package.json", "README.md", "LICENSE", "src", "docs/avatar.png", "docs/package-cover.png", "config.json", "emotes", "scripts/check-package.mjs"]) {
         cpSync(join(root, path), join(scratch, path), { recursive: true });
       }
       if (scenario === "missing Leo metadata") rmSync(join(scratch, "emotes/leo/emotes.json"));
@@ -95,7 +95,7 @@ for (const scenario of ["missing Leo metadata", "missing Leo frame", "unapproved
 test("pack:check rejects a missing fallback without changing the input", () => {
   const scratch = mkdtempSync(join(tmpdir(), "pet-package-test-"));
   try {
-    for (const path of ["package.json", "README.md", "LICENSE", "src", "docs/avatar.png", "config.json", "emotes/pet", "scripts/check-package.mjs"]) {
+    for (const path of ["package.json", "README.md", "LICENSE", "src", "docs/avatar.png", "docs/package-cover.png", "config.json", "emotes/pet", "scripts/check-package.mjs"]) {
       cpSync(join(root, path), join(scratch, path), { recursive: true });
     }
     const before = readFileSync(join(scratch, "package.json"), "utf8");
