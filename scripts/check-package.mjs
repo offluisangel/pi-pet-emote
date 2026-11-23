@@ -20,12 +20,13 @@ try {
   const contents = (path) => tar("-xOzf", archive, `package/${path}`);
   const requireFile = (path) => assert.ok(files.includes(`package/${path}`), `missing ${path}`);
   for (const file of files) {
-    assert.match(file, /^package\/(?:package\.json|README\.md|LICENSE|config\.json|docs\/avatar\.png|src\/[^/]+\.ts|emotes\/(?:pet\/(?:emotes\.json|[^/]+\/[^/]+\.png)|ascii[^/]*\/ascii\.yaml))$/, `unexpected package file: ${file}`);
+    assert.match(file, /^package\/(?:package\.json|README\.md|LICENSE|config\.json|docs\/avatar\.png|src\/[^/]+\.ts|emotes\/(?:(?:pet|leo)\/(?:emotes\.json|[^/]+\/[^/]+\.png)|ascii[^/]*\/ascii\.yaml))$/, `unexpected package file: ${file}`);
   }
   for (const path of ["package.json", "LICENSE", "README.md", "config.json", "emotes/pet/emotes.json", "emotes/ascii-bot/ascii.yaml"]) requireFile(path);
   const manifest = JSON.parse(contents("package.json"));
   assert.equal(manifest.name, "pi-pet-emote");
-  assert.equal(manifest.version, "0.1.0");
+  const sourceManifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+  assert.equal(manifest.version, sourceManifest.version);
   assert.deepEqual(manifest.pi, { image: "./docs/avatar.png", extensions: ["./src/index.ts"] });
   for (const path of [manifest.pi.image, ...manifest.pi.extensions]) requireFile(path.replace(/^\.\//, ""));
   // Compare against actual runtime files, never an authoring fixture excluded from npm.
@@ -34,6 +35,11 @@ try {
   assert.equal(frames.length, 76);
   for (const frame of frames) requireFile(frame);
   assert.equal(files.filter((path) => /^package\/emotes\/pet\/.*\.png$/.test(path)).length, 76);
+  requireFile("emotes/leo/emotes.json");
+  const leoFrames = walk(join(root, "emotes/leo")).filter((path) => path.endsWith(".png"));
+  assert.equal(leoFrames.length, 76);
+  for (const frame of leoFrames) requireFile(frame);
+  assert.equal(files.filter((path) => /^package\/emotes\/leo\/.*\.png$/.test(path)).length, 76);
   const license = contents("LICENSE");
   assert.equal(license, readFileSync(join(root, "LICENSE"), "utf8"));
   for (const name of ["Eiji Onchi", "efolchmontiel", "offluisangel"]) {

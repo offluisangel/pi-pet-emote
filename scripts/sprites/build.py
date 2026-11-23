@@ -1,4 +1,4 @@
-"""Rebuild the single pet set without dependencies or changes to playback timing."""
+"""Rebuild Mafe: python3 -B scripts/sprites/build.py [output-root]."""
 import json
 from pathlib import Path
 import sys
@@ -9,7 +9,8 @@ import motion
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-OUT = ROOT / 'emotes' / 'pet'
+OUTPUT_ROOT = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else ROOT
+OUT = OUTPUT_ROOT / 'emotes' / 'pet'
 
 
 def build():
@@ -23,7 +24,8 @@ def build():
             count += 1
     # Use the shipped metadata, not the superseded TypeScript generator's timings.
     (OUT / 'emotes.json').write_text(json.dumps(contract['emotes'], indent=2) + '\n')
-    (ROOT / 'docs' / 'avatar.png').write_bytes((OUT / 'idle' / 'idle.png').read_bytes())
+    (OUTPUT_ROOT / 'docs').mkdir(parents=True, exist_ok=True)
+    (OUTPUT_ROOT / 'docs' / 'avatar.png').write_bytes((OUT / 'idle' / 'idle.png').read_bytes())
     print(f'sprites: {count} frames, {len(contract["frames"])} states → emotes/pet (48x40 RGBA)')
 
 
