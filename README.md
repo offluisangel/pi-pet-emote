@@ -43,9 +43,12 @@ Run `/reload` in Pi to unload the extension.
 | Command | Action |
 | --- | --- |
 | `/emote` | List available reactions. |
+| `/emote pet` | Choose Mafe or Leo; the active pet is marked. |
 | `/emote <state>` | Preview a reaction. |
 | `/emote demo` | Play the reaction sequence. |
 | `/emote idle` | Stop the preview and return to idle. |
+
+Choosing a different pet switches immediately and stops any preview. Canceling or choosing the active pet changes nothing. Reactions, `demo`, and `idle` use the selected pet in this and future sessions.
 
 ## License
 
