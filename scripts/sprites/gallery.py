@@ -9,7 +9,7 @@ OUT = ROOT / 'design' / 'pet-avatar' / '02-animations.html'
 
 
 def build():
-    contract = json.loads((ROOT / 'scripts' / 'sprites' / 'frames.json').read_text())
+    contract = json.loads((ROOT / 'scripts' / 'sprites' / 'mafe.json').read_text())
     states = []
     for state, names in contract['frames'].items():
         states.append({'name': state, 'frames': [
@@ -49,7 +49,7 @@ summary { cursor: pointer; padding: 12px 0; }
 <h1>One pet, 24 reactions</h1>
 <p>Pink bows, a blue floral bandana, and the approved 48 × 40 canvas. Compare the native sprite with its 4× view; expand a state to inspect every frame. Playback uses the shipped frame intervals, intro order and cycle modes. The rejected verification result is shown separately, never looped.</p>
 <button id="pause" type="button" aria-pressed="false">Pause animations</button><span id="status" role="status"></span>
-<p>76 transparent PNGs · no alternate YOLO character · original widget sizing and timing unchanged.</p>
+<p>145 transparent PNGs · no alternate YOLO character · original widget sizing and cycle lengths.</p>
 </header>
 <main aria-label="Pet animation states"></main>
 <script>
@@ -117,8 +117,9 @@ requestAnimationFrame(tick);
 </script>
 </html>
 '''
+    OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(template.replace('__STATES__', json.dumps(states)).replace('__CONFIG__', json.dumps(contract['emotes'])))
-    print('gallery: 24 animations, 76 embedded PNGs → design/pet-avatar/02-animations.html')
+    print(f'gallery: {len(states)} animations, {sum(len(s["frames"]) for s in states)} embedded PNGs → {OUT}')
 
 
 if __name__ == '__main__':

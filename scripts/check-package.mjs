@@ -34,9 +34,9 @@ try {
   // Compare against actual runtime files, never an authoring fixture excluded from npm.
   for (const path of walk(join(root, "src"))) requireFile(path);
   const frames = walk(join(root, "emotes/pet")).filter((path) => path.endsWith(".png"));
-  assert.equal(frames.length, 76);
+  assert.equal(frames.length, 145);
   for (const frame of frames) requireFile(frame);
-  assert.equal(files.filter((path) => /^package\/emotes\/pet\/.*\.png$/.test(path)).length, 76);
+  assert.equal(files.filter((path) => /^package\/emotes\/pet\/.*\.png$/.test(path)).length, 145);
   requireFile("emotes/leo/emotes.json");
   const leoFrames = walk(join(root, "emotes/leo")).filter((path) => path.endsWith(".png"));
   assert.equal(leoFrames.length, 76);
@@ -51,7 +51,7 @@ try {
   assert.ok(license.includes("Permission is hereby granted, free of charge"));
   assert.ok(license.includes('THE SOFTWARE IS PROVIDED "AS IS"'));
   assert.ok(license.endsWith("SOFTWARE.\n"));
-  console.log(`package check: ${manifest.name}@${manifest.version}; ${files.length} files; 76 pet frames; ${packed.size} bytes packed; ${packed.unpackedSize} bytes unpacked`);
+  console.log(`package check: ${manifest.name}@${manifest.version}; ${files.length} files; ${frames.length} pet frames; ${packed.size} bytes packed; ${packed.unpackedSize} bytes unpacked`);
 } catch (error) {
   console.error(`package check failed: ${error.message}`);
   process.exitCode = 1;

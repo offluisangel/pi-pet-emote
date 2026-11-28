@@ -290,12 +290,12 @@ test("greeting plays arrival once before waving until its hold ends", () => {
   try {
     const files = readdirSync(new URL("../emotes/pet/hi/", import.meta.url)).filter((f) => f.endsWith(".png")).sort();
     const renderer = fakeRenderer({ hi: files, idle: ["idle.png"] });
-    const animator = new Animator({ ...config, cycleMs: 280, holdDuration: { ...config.holdDuration, hi: 2400 } }, renderer as any);
+    const animator = new Animator({ ...config, cycleMs: 140, holdDuration: { ...config.holdDuration, hi: 2400 } }, renderer as any);
     animator.transitionTo("hi");
     mock.timers.tick(2240);
     assert.deepEqual(renderer.shown, [
-      "hi/in_1.png", "hi/in_2.png", "hi/in_3.png", "hi/in_4.png",
-      "hi/in_5.png", "hi/in_6.png", "hi/landed_1.png", "hi/landed_2.png", "hi/landed_1.png",
+      ...Array.from({ length: 6 }, (_, i) => [`hi/in_${i+1}.png`, `hi/in_${i+1}a.png`]).flat(),
+      "hi/landed_1.png", "hi/landed_1a.png", "hi/landed_2.png", "hi/landed_2a.png", "hi/landed_1.png",
     ]);
     mock.timers.tick(160);
     assert.equal(animator.currentState, "idle");

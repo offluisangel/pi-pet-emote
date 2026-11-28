@@ -28,16 +28,35 @@ test("Leo ships the complete 76-frame RGBA contract and approved idle pixels", (
   }
   assert.equal(count, 76);
   assert.equal(createHash("sha256").update(load("idle/idle.png").data).digest("hex"),
-    "8a0d8abfa132e7c6c2555eb900cf62b4ed0976ec692e578a36219039dfd7519f");
+    "4b390c2d5c197a6caa27af75d0c4a851f740cd1f6a8c9bf9e91c84194d18b9cb");
+});
+
+test("every reaction keeps the portrait's tabby mask, collar and plumed tail, and animates each cel", () => {
+  for (const state of EMOTE_STATES.filter(s => s !== "idle")) {
+    const poses = new Set<string>();
+    const names = readdirSync(`emotes/leo/${state}`);
+    for (const name of names) {
+      const image = load(`${state}/${name}`);
+      const colors = new Set<string>();
+      for (let i = 0; i < image.data.length; i += 4) {
+        if (image.data[i + 3]) colors.add(Buffer.from(image.data.slice(i, i + 3)).toString("hex"));
+      }
+      for (const color of ["995132", "94cb36", "ffda94"]) assert.ok(colors.has(color), `${state}/${name}: missing portrait color ${color}`);
+      for (const color of ["b5c66a", "30372c", "654938"]) assert.ok(!colors.has(color), `${state}/${name}: obsolete face color ${color}`);
+      poses.add(createHash("sha256").update(image.data).digest("hex"));
+    }
+    assert.equal(poses.size, names.length, `${state}: repeated cel`);
+  }
 });
 
 test("Leo blink stays inside the eye boxes and the landed wave moves the upper tail without moving its root", () => {
   const base = load("idle/idle.png"), blink = load("idle/idle_blink.png");
+  assert.deepEqual([...pixel(base, 15, 14)], [255, 253, 244, 255], "left eye catchlight");
   let blinkChanges = 0;
   for (let y = 0; y < 40; y++) for (let x = 0; x < 48; x++) {
     if (Buffer.from(pixel(blink, x, y)).equals(Buffer.from(pixel(base, x, y)))) continue;
     blinkChanges++;
-    assert.ok(y >= 16 && y <= 18 && ((x >= 15 && x <= 19) || (x >= 26 && x <= 30)));
+    assert.ok(((y >= 13 && y <= 17 && x >= 13 && x <= 18) || (y >= 15 && y <= 19 && x >= 24 && x <= 29)));
   }
   assert.ok(blinkChanges > 0, "blink changes eye pixels");
   const frames = [load("hi/landed_1.png"), load("hi/landed_2.png")];
@@ -48,8 +67,8 @@ test("Leo blink stays inside the eye boxes and the landed wave moves the upper t
   assert.ok(tailChanges > 0, "pixels outside the waving paw change in the upper-tail region");
   // The exposed root is right of the body, below the swaying portion.
   for (let y = 32; y <= 36; y++) for (let x = 35; x <= 42; x++) {
-    if (pixel(base, x, y)[3]) visibleRoot++;
-    for (const frame of frames) assert.deepEqual(pixel(frame, x, y), pixel(base, x, y), `root ${x},${y}`);
+    if (pixel(frames[0]!, x, y)[3]) visibleRoot++;
+    assert.deepEqual(pixel(frames[1]!, x, y), pixel(frames[0]!, x, y), `root ${x},${y}`);
   }
   assert.ok(visibleRoot > 0, "the asserted root contains visible artwork");
 });

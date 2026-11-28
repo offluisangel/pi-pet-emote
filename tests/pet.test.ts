@@ -13,7 +13,7 @@ const contract = JSON.parse(readFileSync(join(import.meta.dirname, "fixtures", "
 const digest = (data: Uint8Array) => createHash("sha256").update(data).digest("hex");
 
 // The public loader must see the same frame names, order and playback metadata.
-test("the pet preserves all 76 frame names, 24 states and original playback timings", () => {
+test("the pet ships the expanded Mafe frame inventory and playback timings for all 24 states", () => {
   const frames = discoverFrames(SET);
   assert.deepEqual([...frames.keys()].sort(), [...EMOTE_STATES].sort());
   let count = 0;
@@ -21,7 +21,7 @@ test("the pet preserves all 76 frame names, 24 states and original playback timi
     assert.deepEqual(frames.get(state as any)?.files, files, state);
     count += (files as string[]).length;
   }
-  assert.equal(count, 76);
+  assert.ok(count > 76, "Mafe has additional animation poses");
   assert.deepEqual(loadEmotesConfig(SET), contract.emotes);
 });
 
@@ -35,6 +35,7 @@ test("every pet frame is a transparent 48x40 RGBA8 PNG with visible accessories"
       let transparent = 0, pink = 0, navy = 0;
       for (let i = 0; i < image.data.length; i += 4) {
         const [r, g, b, a] = image.data.subarray(i, i + 4);
+        assert.ok(a === 0 || a === 255, label);
         if (a === 0) transparent++;
         if (a === 255 && r === 237 && g === 105 && b === 148) pink++;
         if (a === 255 && r === 53 && g === 69 && b === 117) navy++;
@@ -55,4 +56,19 @@ test("idle is exactly the approved pet, and every animation has distinct poses",
     states.add(hashes.join(","));
   }
   assert.equal(states.size, 24, "each reaction has its own animation");
+});
+
+// Flat color clusters survive the tiny prompt widget; photo-style gradients do not.
+test("every Mafe pose uses a limited pixel-art palette at native resolution", () => {
+  for (const [state, frames] of discoverFrames(SET)) {
+    for (const [name, data] of frames.base64Cache) {
+      const image = decodePng(Buffer.from(data, "base64"));
+      const colors = new Set<number>();
+      for (let i = 0; i < image.data.length; i += 4) {
+        const [r, g, b, a] = image.data.subarray(i, i + 4);
+        if (a) colors.add((r << 16) | (g << 8) | b);
+      }
+      assert.ok(colors.size <= 32, `${state}/${name}: ${colors.size} opaque colors`);
+    }
+  }
 });

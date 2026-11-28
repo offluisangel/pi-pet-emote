@@ -14,12 +14,16 @@ OUT = OUTPUT_ROOT / 'emotes' / 'pet'
 
 
 def build():
-    contract = json.loads((HERE / 'frames.json').read_text())
+    contract = json.loads((HERE / 'mafe.json').read_text())
     count = 0
     for state, files in contract['frames'].items():
         directory = OUT / state
         directory.mkdir(parents=True, exist_ok=True)
-        for index, name in enumerate(files):
+        groups = {}
+        for name in files:
+            group = "intro" if name.startswith("in_") else "fail" if name == "fail.png" else "cycle"
+            index = groups.get(group, 0)
+            groups[group] = index + 1
             (directory / name).write_bytes(motion.render(state, name, index))
             count += 1
     # Use the shipped metadata, not the superseded TypeScript generator's timings.

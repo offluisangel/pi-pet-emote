@@ -1,254 +1,111 @@
 import { Canvas, text } from "../canvas.ts";
+import { fur, portrait, type Gaze } from "./idle.ts";
 
-type Palette = Record<string, string>;
+const paper = "#f0e8d8", ink = "#566681", mint = "#a6d9c3", gold = "#f3d281", red = "#ed8a86";
 
-/** Cat gestures layered over the exact approved drawing, never Mafe's face. */
-export function render(base: Canvas, tail: Canvas, foreground: Canvas, p: Palette,
-  state: string, name: string, n: number): Canvas {
-  let c = new Canvas(48, 40);
-  c.data.set(base.data);
-  const ink = "#758498", paper = "#f0e8d8", gold = "#f3d281";
-  const blue = "#617d9b", mint = "#a6d9c3", red = "#ed8a86";
-  const line = (x: number, y: number, xx: number, yy: number, color = p.edge!) => c.line(x, y, xx, yy, color);
-  const paw = (x: number, y: number) => {
-    c.disc(x, y, 3, p.edge!);
-    c.disc(x, y - 1, 2, p.white!);
-    c.set(x - 1, y + 1, p.cream!);
-    c.set(x + 1, y + 1, p.cream!);
+export function render(state: string, name: string, n: number): Canvas {
+  const beat = n % 2, scan = (["left", "down", "right"] as const)[n % 3]!;
+  const face: Record<string, Gaze> = {
+    hi: "happy", bye: "happy", talk: "open", think: beat ? "right" : "left", ask: "worried", read: scan,
+    write: "down", tool: "right", success: "happy", failure: "worried", compact: "down",
+    grandma: "blink", delegate: "left", jobs: beat ? "blink" : "right", remember: beat ? "blink" : "open",
+    yolo: "happy", "super-yolo": "right", explore: scan, build: "down", verify: name === "fail.png" ? "worried" : "down",
+    judge: "stern", review: beat ? "stern" : "down", jira: scan,
   };
-  const eyes = (mode = "open", look = 0) => {
-    for (const x of [16, 27]) {
-      c.rect(x - 1, 16, 5, 3, p.orange!);
-      if (mode === "closed") c.rect(x, 18, 3, 1, p.edge!);
-      else if (mode === "happy") c.path([[x - 1, 18], [x + 1, 16], [x + 3, 18]], p.edge!);
-      else {
-        // Keep the original 5x3 almond outline even when looking aside.
-        c.rect(x, 16, 3, 1, p.edge!);
-        c.rect(x - 1, 17, 5, 1, p.edge!);
-        c.rect(x, 18, 3, 1, p.edge!);
-        c.rect(x, 17, 3, 1, p.eye!);
-        c.set(x + 1 + look, 17, p.pupil!);
-        c.set(x + (look === -1 ? 2 : 0), 17, "#edf0bb");
-      }
-    }
+  const lips = state === "talk" ? ({ "talk_close.png": 0, "talk_small.png": 1, "talk_mid.png": 2, "talk_wide.png": 3 }[name]!)
+    : state === "super-yolo" ? 3 : state === "yolo" || state === "bye" ? 1 + beat : state === "success" ? 0 : -1;
+  const sways = ["hi", "bye", "success", "yolo", "super-yolo"].includes(state);
+  const c = portrait(face[state]!, sways ? (beat ? 2 : -2) : 0, lips, state === "ask" && beat === 1 || state === "yolo" && !beat);
+  const paw = (x: number, y: number, shoulder = x < 23 ? 16 : 30) => {
+    const arm: [number, number][] = [[shoulder, 30], [Math.round((x + shoulder) / 2), Math.max(30, y + 1)], [x, y]];
+    c.path(arm, fur.k, 4); c.path(arm, fur.L, 2);
+    c.blit([".kkk.", "kWWWk", "kCWWk", ".kCk."], x - 2, y - 2, fur);
   };
-  const mouth = (level: number) => {
-    c.rect(21, 23, 6, 3, p.white!);
-    if (!level) c.path([[22, 24], [23, 25], [24, 24]], p.edge!);
-    else {
-      c.rect(22, 23, 3, level, p.edge!);
-      c.rect(23, 24, 1, Math.max(1, level - 1), p.pink!);
-    }
-  };
-  const sway = (direction: number) => {
-    c.data.fill(0);
-    for (let y = 0; y < 40; y++) for (let x = 0; x < 48; x++) {
-      const color = tail.get(x, y);
-      if (color) c.set(x + (y < 30 ? direction : 0), y, color);
-    }
-    c.stamp(foreground, 0, 0);
-  };
-  const move = (dx: number, dy: number) => {
-    const moved = new Canvas(48, 40);
-    moved.stamp(c, dx, dy);
-    c = moved;
-  };
-  const star = (x: number, y: number, color = gold) => {
-    c.rect(x, y - 2, 1, 5, color);
-    c.rect(x - 2, y, 5, 1, color);
-  };
-  const heart = (x: number, y: number) => {
-    c.blit([".##.##.", "#######", "#######", ".#####.", "..###..", "...#..."], x, y, { "#": p.pink! });
-    c.set(x + 1, y + 1, p.white!);
-  };
+  const heart = (x: number, y: number) => c.blit([".PP.PP.", "PhPPPPP", "PPPPPPR", ".PPPPR.", "..PPR..", "...R..."], x, y, fur);
+  const star = (x: number, y: number) => { c.rect(x, y - 2, 1, 5, gold); c.rect(x - 2, y, 5, 1, gold); };
   const page = () => {
-    c.rect(12, 31, 22, 8, p.edge!);
-    c.rect(13, 32, 20, 6, paper);
-    c.rect(16, 33, 12, 1, ink);
-    c.rect(16, 35, 9, 1, ink);
+    c.rect(12, 31, 22, 8, fur.k); c.rect(13, 32, 20, 6, paper);
+    for (const y of [33, 35]) c.rect(16, y, y === 33 ? 12 : 9, 1, ink);
   };
   const badge = (ok: boolean) => {
-    c.disc(40, 32, 5, blue);
-    if (ok) c.path([[37, 32], [39, 34], [43, 29]], mint, 2);
-    else {
-      c.line(38, 30, 42, 34, red, 2);
-      c.line(42, 30, 38, 34, red, 2);
-    }
+    c.disc(40, 33, 5, ink);
+    if (ok) c.path([[37, 32], [39, 35], [43, 30]], mint, 2);
+    else { c.line(38, 31, 42, 35, red, 2); c.line(42, 31, 38, 35, red, 2); }
   };
-
   switch (state) {
-    case "idle":
-      if (name.includes("blink")) eyes("closed");
-      break;
     case "hi":
       if (name.startsWith("in_")) {
-        // A feline spring into view; the six arrival frames never loop.
-        move([-7, -5, -3, -1, 0, 0][n]!, [0, -2, -3, -2, -1, 0][n]!);
-        paw(39, 18 + n * 2);
-      } else {
-        sway(n % 2 ? 1 : -1);
-        eyes("happy");
-        paw(39, 18 + n % 2 * 5);
+        paw(36, 18 + n * 2);
+        const hop = new Canvas(48, 40);
+        hop.stamp(c, [-7, -5, -3, -1, 0, 0][n]!, [0, -1, -2, -1, 0, 0][n]!);
+        return hop;
       }
-      break;
-    case "talk":
-      mouth({ "talk_close.png": 0, "talk_small.png": 1, "talk_mid.png": 2, "talk_wide.png": 3 }[name]!);
-      break;
-    case "think":
-      eyes("open", n ? 1 : -1);
-      paw(29, 24 + n);
-      c.disc(40, 10 - n, 1, paper);
-      c.disc(43, 5 - n, 2, paper);
-      break;
-    case "ask":
-      eyes("open", n ? 1 : 0);
-      paw(8, 27 - n * 3);
-      text(c, "?", 41, 3 + n, gold);
-      break;
+      paw(36, 19 + beat * 5); break;
+    case "bye": paw(11 - beat * 3, 24 - beat * 3); heart(1, 3 + n * 2); break;
+    case "talk": break; // Four lip shapes are drawn directly beneath the tilted nose.
+    case "ask": paw(9, 26 - n * 3); text(c, "?", 39, 4 + n, gold); break;
+    case "think": paw(26, 24 + n); c.disc(36, 12 - n, 1, paper); c.disc(40, 7 - n, 2, paper); break;
     case "read":
-      eyes("open", n - 1);
-      c.path([[10, 30], [23, 32], [25, 32], [38, 30], [38, 37], [24, 39], [10, 37], [10, 30]], blue, 2);
-      c.rect(12, 32, 11, 5, paper);
-      c.rect(25, 32, 11, 5, p.cream!);
-      for (const y of [33, 35]) {
-        line(14, y, 21, y + 1, ink);
-        line(27, y + 1, 34, y, ink);
-      }
-      line(23 + n, 32, 23 + n, 38, gold);
-      paw(10, 34); paw(38, 34);
-      break;
+      c.path([[9, 30], [22, 32], [25, 32], [38, 30], [38, 37], [24, 39], [9, 37], [9, 30]], ink, 2);
+      c.rect(11, 32, 12, 5, paper); c.rect(25, 32, 12, 5, fur.C);
+      for (const y of [33, 35]) { c.line(14, y, 21, y + 1, ink); c.line(27, y + 1, 34, y, ink); }
+      c.line(23 + n, 32, 24, 38, gold); paw(10, 34); paw(38, 34); break;
     case "write": {
-      eyes("open", n % 2);
-      page();
-      const x = 20 + n * 3;
-      line(x, 35, x + 5, 27, gold);
-      line(x, 35, x + 1, 34);
-      paw(x + 4, 29);
-      c.rect(16, 37, 2 + n * 3, 1, ink);
-      break;
+      page(); const x = 19 + n * 3;
+      c.line(x, 36, x + 5, 27, gold, 2); c.set(x, 36, fur.k); paw(x + 4, 30, 30);
+      c.rect(16, 36, x - 16, 1, ink); break;
     }
     case "tool": {
-      eyes("open", 1);
-      const x = 38 + (n === 1 ? 2 : 0), y = 25 + n;
-      c.rect(x, y, 2, 11, ink);
-      c.path([[x - 2, y - 4], [x - 2, y], [x + 3, y], [x + 3, y - 4]], ink, 2);
-      paw(x - 2, 31 + n);
-      break;
+      const x = 37 + beat * 2, y = 21 + n;
+      c.line(x, y + 4, 35, 35, ink, 3); c.path([[x - 2, y], [x - 2, y + 4], [x + 2, y + 4], [x + 3, y]], ink, 2);
+      paw(36 + beat, 30 + n); break;
     }
-    case "success":
-      sway(n ? 1 : -1); eyes("happy"); mouth(1);
-      paw(7, 23 - n * 3); paw(39, 23 - n * 3);
-      star(4, 10 + n * 3); star(43, 9 - n * 3); badge(true);
-      break;
-    case "failure":
-      eyes("closed");
-      // A drooping whisker and falling tear, not a recolored success pose.
-      c.path([[12, 22], [8, 23 + n]], p.cream!);
-      c.rect(31, 20 + n * 2, 1, 3, mint);
-      paw(18, 29 + n); badge(false);
-      break;
+    case "success": paw(10, 22 - n * 3); paw(35, 22 - n * 3); star(4, 11 + n); badge(true); break;
+    case "failure": c.rect(28, 20 + n * 2, 2, 3, mint); paw(17, 30 - n * 2); badge(false); break;
     case "compact":
-      eyes("open", n === 1 ? -1 : 0);
-      for (let j = 0; j < 3; j++) {
-        c.rect(14 + j * (5 - n * 2), 32 + j * 2, 13, 2, j % 2 ? ink : paper);
-      }
-      paw(10 + n, 33); paw(37 - n, 33);
-      break;
+      for (let j = 0; j < 3; j++) c.rect(13 + j * (5 - n * 2), 31 + j * 2, 14, 2, j % 2 ? ink : paper);
+      paw(10 + n * 2, 33); paw(38 - n * 3, 33); break;
     case "grandma":
-      eyes("closed");
-      // Leo kneads a blanket before settling down, rather than becoming a person.
-      c.rect(9, 34, 30, 5, blue);
-      for (let x = 11; x < 38; x += 4) c.rect(x, 35, 2, 3, mint);
-      if (name.startsWith("in_")) {
-        paw(18, 32 + n % 2); paw(29, 33 - n % 2);
-        c.rect(11 + n * 8, 37, 5, 1, paper);
-      } else {
-        paw(18, 34); paw(29, 34);
-        text(c, "Z", 40, 5 + n % 2 * 2, paper);
-      }
-      break;
-    case "bye":
-      sway(n % 2 ? 1 : -1); eyes("happy");
-      paw(39, 20 + n % 2 * 4); heart(1, 3 + n * 2);
-      if (name.startsWith("in_")) mouth(n % 2 + 1);
-      break;
+      c.rect(9, 33, 30, 6, ink);
+      for (let x = 10; x < 38; x += 4) c.rect(x, 35, 2, 3, mint);
+      paw(16 + (name.startsWith("in_") ? n : 0), 32 + beat * 2); paw(30, 34 - beat * 2);
+      if (!name.startsWith("in_")) text(c, "Z", 40, 6 - beat * 2, paper); break;
     case "delegate":
-      eyes("open", n - 1);
-      // Passing little task envelopes outward with a white cat paw.
       for (let j = 0; j <= n; j++) {
-        const x = 2 + j * 5;
-        c.rect(x, 31, 5, 4, paper);
-        c.path([[x, 31], [x + 2, 33], [x + 4, 31]], ink);
+        const x = 13 - 5 * j; c.rect(x, 33, 7, 5, paper); c.path([[x, 33], [x + 3, 36], [x + 6, 33]], ink);
       }
-      paw(9 + n * 3, 28 + n);
-      break;
+      paw(16 - n * 5, 31); break;
     case "jobs":
-      eyes(n === 1 ? "closed" : "open");
-      c.disc(40, 32, 6, blue); c.disc(40, 32, 4, paper);
-      line(40, 32, 40, 29, ink);
-      line(40, 32, [37, 42, 40][n]!, [33, 34, 35][n]!, ink);
-      paw(33, 34 - n);
-      break;
-    case "remember":
-      eyes(n ? "closed" : "open");
-      heart(1, 4 + n * 2); paw(27, 29 - n);
-      break;
-    case "yolo":
-    case "super-yolo":
-      sway(n ? 1 : -1); eyes(n ? "closed" : "happy"); mouth(2);
-      paw(7, 21 - n * 2); paw(39, 21 + n * 2);
-      star(4, 8 + n * 2);
-      if (state === "super-yolo") {
-        // A tiny rocket beside the cat: exuberance without changing its face.
-        c.path([[40, 13], [43, 7], [46, 13], [46, 22], [40, 22], [40, 13]], blue);
-        c.rect(41, 13, 5, 8, paper); c.disc(43, 16, 1, mint);
-        c.path([[41, 23], [43, 27 + n * 3], [45, 23]], gold, 2);
-        star(5, 28 - n * 3, mint);
-      } else star(43, 8 - n * 2);
-      break;
+      c.disc(39, 33, 6, ink); c.disc(39, 33, 4, paper); c.line(39, 33, 39, 30, ink);
+      c.line(39, 33, [36, 42, 39][n]!, [34, 34, 36][n]!, ink); paw(33, 34 - n); break;
+    case "remember": heart(2, 4 + n * 2); paw(23, 30 - n, 30); break;
+    case "yolo": paw(9, 21 + n * 4); paw(35, 25 - n * 4); star(4, 9 + n); star(42, 8 - n); break;
+    case "super-yolo": {
+      paw(36, 22 - n * 3); star(5, 10 + n * 3);
+      c.blit(["...k...", "..kWk..", ".kWWWk.", ".kWWWk.", ".kBaBk.", ".kWWWk.", "kkWWWkk", "k.kSk.k", "..LHL..", "...L..."], 39, 12 - n * 5, fur); break;
+    }
     case "explore": {
-      eyes("open", n - 1);
-      const x = 36 + n;
-      c.disc(x, 27, 5, gold); c.disc(x, 27, 3, mint);
-      c.ring(x, 27, 2, blue); c.set(x - 1, 25, paper);
-      c.line(x - 3, 31, x - 6, 36, gold, 2); paw(x - 5, 33);
-      break;
+      const x = 33 + n * 2, y = 23 - n;
+      c.disc(x, y, 5, gold); c.disc(x, y, 3, mint); c.ring(x, y, 2, ink); c.set(x - 1, y - 2, paper);
+      c.line(x - 2, y + 4, x - 6, y + 11, gold, 2); paw(x - 4, y + 8); break;
     }
     case "build":
-      eyes("open", 1);
       for (let j = 0; j <= n; j++) {
-        c.rect(34 + j % 2 * 3, 36 - j * 3, 8, 3, p.stripe!);
-        c.rect(35 + j % 2 * 3, 36 - j * 3, 6, 1, gold);
+        const x = 2 + j % 2 * 2, y = 35 - j * 4;
+        c.rect(x, y, 10, 4, ink);
+        c.rect(x + 1, y + 1, 8, 2, mint);
       }
-      paw(36, 27 + n * 2);
-      break;
-    case "verify":
-      eyes("open", 1); page(); badge(name !== "fail.png");
-      if (name === "fail.png") eyes("closed");
-      else {
-        c.rect(15, 32 + n, 14, 1, mint);
-        paw(9, 30 + n);
-      }
-      break;
+      paw(10 + beat * 2, 33 - n * 4); break;
+    case "verify": page(); badge(name !== "fail.png");
+      if (name !== "fail.png") { c.rect(15, 32 + n, 14, 1, mint); paw(12, 31 + n); }
+      else paw(16, 24); break;
     case "judge":
-      eyes(n ? "closed" : "open");
-      c.rect(38, 26 + n * 3, 2, 9, p.stripe!);
-      c.rect(35, 24 + n * 3, 8, 4, p.edge!);
-      c.rect(36, 24 + n * 3, 6, 2, gold);
-      c.rect(34, 37, 11, 2, p.edge!); paw(34, 30 + n);
-      break;
-    case "review":
-      eyes("open", n % 2 ? -1 : 0); page();
-      c.rect(16, 33 + n, 11, 1, red); paw(33, 30 + n % 2);
-      break;
+      c.rect(37, 24 + n * 5, 2, 9, fur.S); c.rect(34, 23 + n * 5, 9, 4, fur.k); c.rect(35, 23 + n * 5, 7, 2, gold);
+      c.rect(33, 37, 11, 2, fur.k); paw(36, 29 + n * 4); break;
+    case "review": page(); c.rect(16, 33 + n, 11, 1, red); paw(29 - n, 32 + n); break;
     case "jira":
-      eyes("open", n - 1);
-      for (let j = 0; j < 3; j++) {
-        c.rect(10 + j * 9, 32, 8, 7, blue);
-        c.rect(11 + j * 9, 33, 6, 2, j === n ? gold : paper);
-      }
-      paw(13 + n * 9, 30);
-      break;
+      for (let j = 0; j < 3; j++) { c.rect(10 + j * 9, 32, 8, 7, ink); c.rect(11 + j * 9, 33, 6, 3, j === n ? gold : paper); }
+      paw(13 + n * 9, 31); break;
     default: throw new Error(`Unknown Leo state: ${state}`);
   }
   return c;

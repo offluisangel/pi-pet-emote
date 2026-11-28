@@ -1,6 +1,6 @@
 # pi-pet-emote
 
-Meet **Mafe the dog** and **Leo the cat**, reactive pixel-art companions beside your [Pi](https://pi.dev) prompt. Choose either pet: 24 reactions follow local session events—thinking, tools, questions, and results—with no model calls.
+Meet **Mafe the dog** and **Leo the cat**, reactive illustrated companions beside your [Pi](https://pi.dev) prompt. Choose either pet: 24 reactions follow local session events—thinking, tools, questions, and results—with no model calls.
 
 ![Mafe the dog and Leo the cat in pixel art](docs/package-cover.png)
 

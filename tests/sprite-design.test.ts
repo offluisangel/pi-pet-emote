@@ -71,6 +71,12 @@ test("greeting bounces into place then waves with the approved accessories", () 
   const intro = image("hi", "in_1");
   const wave = image("hi", "landed_1");
   assert.notDeepEqual(intro.data, wave.data);
-  assert.ok(count(wave, [222, 214, 199], 38, 21, 44, 30) > 5, "raised paw");
+  // The illustrated paw has shaded cream fur, not a single flat palette entry.
+  let pawPixels = 0;
+  for (let y = 18; y <= 22; y++) for (let x = 34; x <= 39; x++) {
+    const [r, g, b, a] = wave.data.subarray((y * 48 + x) * 4, (y * 48 + x) * 4 + 4);
+    if (a === 255 && r > 205 && g > 165 && b < r) pawPixels++;
+  }
+  assert.ok(pawPixels > 5, "raised cream paw");
   assert.notDeepEqual(wave.data, image("hi", "landed_2").data);
 });

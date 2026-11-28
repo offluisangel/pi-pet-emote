@@ -8,7 +8,9 @@
       "talk_close.png": 1,
       "talk_small.png": 3,
       "talk_mid.png": 3,
-      "talk_wide.png": 1
+      "talk_wide.png": 1,
+      "talk_round.png": 2,
+      "talk_smile.png": 1
     }
   },
   "cycle": {
@@ -34,27 +36,27 @@
     "jira": "loop"
   },
   "frameMs": {
-    "hi": 280,
-    "think": 420,
-    "tool": 260,
-    "write": 240,
-    "read": 450,
-    "ask": 800,
-    "success": 420,
-    "failure": 380,
-    "compact": 380,
-    "grandma": 520,
-    "bye": 650,
-    "delegate": 320,
-    "jobs": 900,
-    "remember": 800,
-    "yolo": 1100,
-    "super-yolo": 1100,
-    "explore": 420,
-    "build": 280,
-    "verify": 360,
-    "judge": 450,
-    "review": 1200,
-    "jira": 380
+    "hi": 140,
+    "think": 210,
+    "tool": 130,
+    "write": 120,
+    "read": 225,
+    "ask": 400,
+    "success": 210,
+    "failure": 190,
+    "compact": 190,
+    "grandma": 260,
+    "bye": 325,
+    "delegate": 160,
+    "jobs": 450,
+    "remember": 400,
+    "yolo": 550,
+    "super-yolo": 550,
+    "explore": 210,
+    "build": 140,
+    "verify": 180,
+    "judge": 225,
+    "review": 600,
+    "jira": 190
   }
 }

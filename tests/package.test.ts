@@ -61,7 +61,7 @@ test("pack:check accepts the source manifest version without changing input or l
     const result = spawnSync("npm", ["run", "pack:check"], { cwd: scratch, encoding: "utf8" });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stderr, "");
-    assert.match(result.stdout, /package check: pi-pet-emote@9\.8\.7; \d+ files; 76 pet frames; \d+ bytes packed; \d+ bytes unpacked/);
+    assert.match(result.stdout, /package check: pi-pet-emote@9\.8\.7; \d+ files; 145 pet frames; \d+ bytes packed; \d+ bytes unpacked/);
     assert.deepEqual(readFileSync(join(scratch, "package.json")), before);
     assert.deepEqual(readdirSync(scratch).sort(), entries);
   } finally {

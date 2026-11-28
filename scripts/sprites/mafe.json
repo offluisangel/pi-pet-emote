@@ -1,0 +1,259 @@
+{
+  "frames": {
+    "ask": [
+      "ask_1.png",
+      "ask_1a.png",
+      "ask_2.png",
+      "ask_2a.png"
+    ],
+    "build": [
+      "build_1.png",
+      "build_1a.png",
+      "build_2.png",
+      "build_2a.png",
+      "build_3.png",
+      "build_3a.png"
+    ],
+    "bye": [
+      "bye_1.png",
+      "bye_1a.png",
+      "bye_2.png",
+      "bye_2a.png",
+      "in_1.png",
+      "in_1a.png",
+      "in_2.png",
+      "in_2a.png"
+    ],
+    "compact": [
+      "compact_1.png",
+      "compact_1a.png",
+      "compact_2.png",
+      "compact_2a.png",
+      "compact_3.png"
+    ],
+    "delegate": [
+      "delegate_1.png",
+      "delegate_1a.png",
+      "delegate_2.png",
+      "delegate_2a.png",
+      "delegate_3.png",
+      "delegate_3a.png"
+    ],
+    "explore": [
+      "explore_1.png",
+      "explore_1a.png",
+      "explore_2.png",
+      "explore_2a.png",
+      "explore_3.png",
+      "explore_3a.png"
+    ],
+    "failure": [
+      "failure_1.png",
+      "failure_1a.png",
+      "failure_2.png",
+      "failure_2a.png",
+      "failure_3.png",
+      "failure_3a.png"
+    ],
+    "grandma": [
+      "in_1.png",
+      "in_1a.png",
+      "in_2.png",
+      "in_2a.png",
+      "in_3.png",
+      "in_3a.png",
+      "knit_1.png",
+      "knit_1a.png",
+      "knit_2.png",
+      "knit_2a.png"
+    ],
+    "hi": [
+      "in_1.png",
+      "in_1a.png",
+      "in_2.png",
+      "in_2a.png",
+      "in_3.png",
+      "in_3a.png",
+      "in_4.png",
+      "in_4a.png",
+      "in_5.png",
+      "in_5a.png",
+      "in_6.png",
+      "in_6a.png",
+      "landed_1.png",
+      "landed_1a.png",
+      "landed_2.png",
+      "landed_2a.png"
+    ],
+    "idle": [
+      "idle.png",
+      "idle_blink.png"
+    ],
+    "jira": [
+      "jira_1.png",
+      "jira_1a.png",
+      "jira_2.png",
+      "jira_2a.png",
+      "jira_3.png",
+      "jira_3a.png"
+    ],
+    "jobs": [
+      "jobs_1.png",
+      "jobs_1a.png",
+      "jobs_2.png",
+      "jobs_2a.png",
+      "jobs_3.png",
+      "jobs_3a.png"
+    ],
+    "judge": [
+      "judge_1.png",
+      "judge_1a.png",
+      "judge_2.png",
+      "judge_2a.png"
+    ],
+    "read": [
+      "read_1.png",
+      "read_1a.png",
+      "read_2.png",
+      "read_2a.png",
+      "read_3.png"
+    ],
+    "remember": [
+      "remember_1.png",
+      "remember_1a.png",
+      "remember_2.png",
+      "remember_2a.png"
+    ],
+    "review": [
+      "review_1.png",
+      "review_1a.png",
+      "review_2.png",
+      "review_2a.png",
+      "review_3.png",
+      "review_3a.png",
+      "review_4.png",
+      "review_4a.png"
+    ],
+    "success": [
+      "success_1.png",
+      "success_1a.png",
+      "success_2.png",
+      "success_2a.png"
+    ],
+    "super-yolo": [
+      "super-yolo.png",
+      "super-yolo_blink.png",
+      "super-yolo_perk.png",
+      "super-yolo_tilt.png"
+    ],
+    "talk": [
+      "talk_close.png",
+      "talk_mid.png",
+      "talk_round.png",
+      "talk_small.png",
+      "talk_smile.png",
+      "talk_wide.png"
+    ],
+    "think": [
+      "think_1.png",
+      "think_1a.png",
+      "think_2.png",
+      "think_2a.png"
+    ],
+    "tool": [
+      "tool_1.png",
+      "tool_1a.png",
+      "tool_2.png",
+      "tool_2a.png",
+      "tool_3.png",
+      "tool_3a.png"
+    ],
+    "verify": [
+      "fail.png",
+      "verify_1.png",
+      "verify_1a.png",
+      "verify_2.png",
+      "verify_2a.png",
+      "verify_3.png",
+      "verify_3a.png"
+    ],
+    "write": [
+      "write_1.png",
+      "write_1a.png",
+      "write_2.png",
+      "write_2a.png",
+      "write_3.png",
+      "write_3a.png",
+      "write_4.png",
+      "write_4a.png"
+    ],
+    "yolo": [
+      "yolo.png",
+      "yolo_blink.png",
+      "yolo_perk.png",
+      "yolo_tilt.png"
+    ]
+  },
+  "emotes": {
+    "idle": {
+      "default": "idle.png",
+      "blink": "idle_blink.png"
+    },
+    "talk": {
+      "weights": {
+        "talk_close.png": 1,
+        "talk_small.png": 3,
+        "talk_mid.png": 3,
+        "talk_wide.png": 1,
+        "talk_round.png": 2,
+        "talk_smile.png": 1
+      }
+    },
+    "cycle": {
+      "hi": "loop",
+      "think": "loop",
+      "tool": "loop",
+      "write": "loop",
+      "ask": "loop",
+      "success": "loop",
+      "failure": "loop",
+      "read": "pingpong",
+      "compact": "pingpong",
+      "delegate": "loop",
+      "jobs": "loop",
+      "remember": "loop",
+      "yolo": "loop",
+      "super-yolo": "loop",
+      "explore": "loop",
+      "build": "loop",
+      "verify": "loop",
+      "judge": "loop",
+      "review": "loop",
+      "jira": "loop"
+    },
+    "frameMs": {
+      "hi": 140,
+      "think": 210,
+      "tool": 130,
+      "write": 120,
+      "read": 225,
+      "ask": 400,
+      "success": 210,
+      "failure": 190,
+      "compact": 190,
+      "grandma": 260,
+      "bye": 325,
+      "delegate": 160,
+      "jobs": 450,
+      "remember": 400,
+      "yolo": 550,
+      "super-yolo": 550,
+      "explore": 210,
+      "build": 140,
+      "verify": 180,
+      "judge": 225,
+      "review": 600,
+      "jira": 190
+    }
+  }
+}
